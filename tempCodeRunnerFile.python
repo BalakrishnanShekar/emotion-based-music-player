@@ -1,0 +1,65 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Define the demand and supply functions
+def demand(price):
+    return 100 - 2 * price
+
+def supply(price):
+    return 3 * price
+
+# Prices for plotting
+prices = np.linspace(0, 40, 400)
+
+# Quantities for the initial supply and demand curves
+quantities_demand = demand(prices)
+quantities_supply = supply(prices)
+
+# Define the tax
+tax = 10
+
+# Quantities for the supply curve after tax
+quantities_supply_after_tax = supply(prices - tax)
+
+# Equilibrium calculations (solve for when supply equals demand)
+def find_equilibrium():
+    for price in prices:
+        if demand(price) - supply(price) <= 0.1:
+            return price, demand(price)
+    return None, None
+
+def find_new_equilibrium():
+    for price in prices:
+        if demand(price) - supply(price - tax) <= 0.1:
+            return price, demand(price)
+    return None, None
+
+equilibrium_price, equilibrium_quantity = find_equilibrium()
+new_equilibrium_price, new_equilibrium_quantity = find_new_equilibrium()
+
+# Plotting the graph
+plt.figure(figsize=(10, 6))
+
+# Initial supply and demand curves
+plt.plot(quantities_demand, prices, label='Demand Curve', color='blue')
+plt.plot(quantities_supply, prices, label='Supply Curve', color='green')
+
+# Supply curve after tax
+plt.plot(quantities_supply_after_tax, prices, label='Supply Curve with Tax', color='green', linestyle='dashed')
+
+# Mark equilibrium points
+plt.scatter([equilibrium_quantity], [equilibrium_price], color='black')
+plt.text(equilibrium_quantity, equilibrium_price, 'E₀', verticalalignment='bottom', horizontalalignment='right')
+
+plt.scatter([new_equilibrium_quantity], [new_equilibrium_price], color='black')
+plt.text(new_equilibrium_quantity, new_equilibrium_price, 'E₁', verticalalignment='bottom', horizontalalignment='right')
+
+# Highlight deadweight loss area
+plt.fill_betweenx(prices, supply(prices) + tax, demand(prices), where=(prices < equilibrium_price) & (prices > new_equilibrium_price), color='red', alpha=0.5, label='Deadweight Loss')
+
+plt.xlabel('Quantity')
+plt.ylabel('Price')
+plt.title('Deadweight Loss due to Tax')
+plt.legend()
+plt.grid(True)
+plt.show()
